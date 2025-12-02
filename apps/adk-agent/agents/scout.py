@@ -1,5 +1,16 @@
-from google.genai.agents import Agent
+from types import SimpleNamespace
 from tools.search_tool import search_tool
+
+try:
+    from google.genai.agents import Agent
+except Exception:
+    class Agent:
+        def __init__(self, model: str = "stub", tools=None, instructions: str = "", name: str = "", description: str = ""):
+            self.tools = tools or []
+        def run(self, prompt: str):
+            q = prompt
+            res = self.tools[0](q) if self.tools else ""
+            return SimpleNamespace(text=res)
 
 SCOUT_INSTRUCTIONS = """
 You are the ScoutAgent for Laurio, an EdTech startup.

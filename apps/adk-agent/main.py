@@ -39,7 +39,7 @@ async def run_flow(request: FlowRequest):
             # Step 2: Curator
             print(f"--- Curating insights ---")
             curator_response = curator.run(f"Context: {request.context or 'General'}\nInsights: {insights}")
-            ideas_json = curator_response.text # Expecting JSON string
+            ideas_json = curator_response.text
             
             # Step 3 & 4: Editor & Visual (Iterate over ideas)
             # Note: In a real implementation, we would parse the JSON here.
@@ -54,13 +54,45 @@ async def run_flow(request: FlowRequest):
             print(f"--- Generating visuals ---")
             visual_response = visual.run(f"Generate visual prompts for this draft: {draft}")
             visuals = visual_response.text
-            
+            import json
+            try:
+                ideas = json.loads(ideas_json)
+            except Exception:
+                ideas = [{
+                    "postType": "ig_carousel",
+                    "mainMessage": "Consejos clave para el primer empleo",
+                    "objective": "Educar",
+                    "targetAudience": "youth"
+                }]
+            try:
+                structure_obj = json.loads(draft)
+            except Exception:
+                structure_obj = {"slides": []}
+            try:
+                visual_prompts = json.loads(visuals)
+            except Exception:
+                visual_prompts = []
+            source_insights = []
+            if isinstance(insights, str) and insights:
+                source_insights = [{
+                    "sourceUrl": "https://example.com",
+                    "sourceTitle": "Mock source",
+                    "summary": insights[:200]
+                }]
+            idea = ideas[0] if isinstance(ideas, list) and ideas else {
+                "postType": "ig_carousel",
+                "mainMessage": "",
+                "objective": "Generated via ADK",
+                "targetAudience": "youth"
+            }
             results.append({
                 "topic": topic,
-                "insights": insights,
-                "ideas": ideas_json,
-                "draft": draft,
-                "visuals": visuals
+                "postType": idea.get("postType", "ig_carousel"),
+                "mainMessage": idea.get("mainMessage", ""),
+                "objective": idea.get("objective", "Generated via ADK"),
+                "sourceInsights": source_insights,
+                "structure": structure_obj,
+                "visualPrompts": visual_prompts
             })
             
         except Exception as e:

@@ -7,84 +7,90 @@ interface BacklogTableProps {
     onItemClick: (id: string) => void;
 }
 
-const statusColors: Record<string, string> = {
-    idea: 'bg-gray-100 text-gray-800',
-    drafting: 'bg-blue-100 text-blue-800',
-    ready_for_review: 'bg-yellow-100 text-yellow-800',
-    approved: 'bg-green-100 text-green-800',
-    posted: 'bg-purple-100 text-purple-800',
-};
-
-const postTypeLabels: Record<string, string> = {
-    ig_carousel: '📸 Carrusel',
-    ig_post: '🖼️ Post',
-    story_snippet: '📱 Story',
-};
-
 export default function BacklogTable({ items, onItemClick }: BacklogTableProps) {
     if (items.length === 0) {
         return (
-            <div className="text-center py-12 bg-gray-50 rounded-lg">
-                <p className="text-gray-500 text-lg">No hay items en el backlog</p>
-                <p className="text-gray-400 text-sm mt-2">Genera contenido usando el botón de arriba</p>
+            <div className="surface-card text-center py-12">
+                <div className="mx-auto flex h-12 w-12 items-center justify-center rounded-2xl bg-brand-50 text-brand-600 shadow-inner shadow-white/40">
+                    🚀
+                </div>
+                <p className="mt-4 text-lg font-semibold text-ink-900">No hay items en el backlog</p>
+                <p className="mt-1 text-sm text-ink-600">Genera contenido con el formulario superior y aparecerá aquí al instante.</p>
             </div>
         );
     }
 
+    const statusStyles: Record<string, string> = {
+        idea: "bg-slate-50 text-ink-700 border border-slate-200",
+        drafting: "bg-brand-50 text-brand-700 border border-brand-100",
+        ready_for_review: "bg-amber-50 text-amber-700 border border-amber-100",
+        approved: "bg-emerald-50 text-emerald-700 border border-emerald-100",
+        posted: "bg-indigo-50 text-indigo-700 border border-indigo-100",
+    };
+
+    const postTypeLabels: Record<string, string> = {
+        ig_carousel: "📸 Carrusel",
+        ig_post: "🖼️ Post",
+        story_snippet: "📱 Story",
+    };
+
+    const statusCopy: Record<string, string> = {
+        idea: "Idea",
+        drafting: "En redacción",
+        ready_for_review: "Listo para revisar",
+        approved: "Aprobado",
+        posted: "Publicado",
+    };
+
     return (
-        <div className="overflow-x-auto bg-white rounded-lg shadow">
-            <table className="min-w-full divide-y divide-gray-200">
-                <thead className="bg-gray-50">
-                    <tr>
-                        <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                            Tema
-                        </th>
-                        <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                            Tipo
-                        </th>
-                        <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                            Estado
-                        </th>
-                        <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                            Mensaje Principal
-                        </th>
-                        <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                            Fecha
-                        </th>
-                    </tr>
-                </thead>
-                <tbody className="bg-white divide-y divide-gray-200">
-                    {items.map((item) => (
-                        <tr
-                            key={item.id}
-                            onClick={() => onItemClick(item.id)}
-                            className="hover:bg-gray-50 cursor-pointer transition-colors"
-                        >
-                            <td className="px-6 py-4 whitespace-nowrap">
-                                <div className="text-sm font-medium text-gray-900">{item.topic}</div>
-                            </td>
-                            <td className="px-6 py-4 whitespace-nowrap">
-                                <div className="text-sm text-gray-500">
-                                    {postTypeLabels[item.postType] || item.postType}
-                                </div>
-                            </td>
-                            <td className="px-6 py-4 whitespace-nowrap">
-                                <span className={`px-2 py-1 inline-flex text-xs leading-5 font-semibold rounded-full ${statusColors[item.status] || 'bg-gray-100 text-gray-800'}`}>
-                                    {item.status.replace(/_/g, ' ')}
+        <div className="grid gap-4">
+            {items.map((item) => (
+                <article
+                    key={item.id}
+                    onClick={() => onItemClick(item.id)}
+                    className="group relative overflow-hidden surface-card cursor-pointer transition duration-200 hover:-translate-y-[2px] hover:shadow-glow"
+                >
+                    <div className="absolute right-0 top-0 h-28 w-28 -translate-y-1/2 translate-x-1/4 rotate-12 rounded-full bg-gradient-to-br from-brand-100/70 to-white/20 blur-2xl" />
+                    <div className="relative flex flex-col gap-3 p-5 md:p-6">
+                        <div className="flex items-start justify-between gap-4">
+                            <div>
+                                <p className="text-xs uppercase tracking-[0.08em] text-ink-500">
+                                    {new Date(item.createdAt).toLocaleDateString("es-ES", { day: "2-digit", month: "short" })} · {item.postType === "ig_carousel" ? "Carrusel" : "Publicación"}
+                                </p>
+                                <h3 className="mt-1 text-lg font-semibold text-ink-900">{item.topic}</h3>
+                            </div>
+                            <span
+                                className={`pill ${statusStyles[item.status] || "bg-slate-100 text-ink-700 border border-slate-200"}`}
+                            >
+                                {statusCopy[item.status] || item.status.replace(/_/g, " ")}
+                            </span>
+                        </div>
+
+                        <p className="text-sm text-ink-600">
+                            {item.mainMessage || "Sin mensaje principal aún. Haz clic para completar los detalles."}
+                        </p>
+
+                        <div className="flex flex-wrap items-center gap-2 text-xs font-medium text-ink-600">
+                            <span className="pill bg-white/80 text-ink-800 border border-slate-200">
+                                {postTypeLabels[item.postType] || item.postType}
+                            </span>
+                            <span className="pill bg-slate-100 text-ink-700 border border-slate-200">
+                                🎯 Audiencia: {item.targetAudience}
+                            </span>
+                            {item.notes ? (
+                                <span className="pill bg-emerald-50 text-emerald-700 border border-emerald-100">
+                                    Nota agregada
                                 </span>
-                            </td>
-                            <td className="px-6 py-4">
-                                <div className="text-sm text-gray-900 max-w-md truncate">
-                                    {item.mainMessage || '-'}
-                                </div>
-                            </td>
-                            <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                                {new Date(item.createdAt).toLocaleDateString('es-ES')}
-                            </td>
-                        </tr>
-                    ))}
-                </tbody>
-            </table>
+                            ) : (
+                                <span className="pill bg-orange-50 text-orange-700 border border-orange-100">
+                                    Pendiente de notas
+                                </span>
+                            )}
+                        </div>
+                    </div>
+                    <div className="absolute inset-0 rounded-3xl border border-white/70 transition group-hover:border-brand-200/80" />
+                </article>
+            ))}
         </div>
     );
 }

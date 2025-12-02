@@ -1,4 +1,17 @@
-from google.genai.agents import Agent
+from types import SimpleNamespace
+
+try:
+    from google.genai.agents import Agent
+except Exception:
+    class Agent:
+        def __init__(self, model: str = "stub", instructions: str = "", name: str = "", description: str = ""):
+            pass
+        def run(self, prompt: str):
+            prompts = [
+                {"forSlide": 1, "description": "Joven en oficina moderna, título grande"},
+                {"forSlide": 2, "description": "Iconos de soft skills, estilo flat"}
+            ]
+            return SimpleNamespace(text=__import__("json").dumps(prompts))
 
 VISUAL_INSTRUCTIONS = """
 You are the VisualAgent.

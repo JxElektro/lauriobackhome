@@ -46,58 +46,84 @@ export default function GenerateContentForm({ onSuccess }: GenerateContentFormPr
     };
 
     return (
-        <div className="bg-white rounded-lg shadow p-6">
-            <h2 className="text-xl font-semibold mb-4">Generar Contenido Semanal</h2>
-
-            <form onSubmit={handleSubmit} className="space-y-4">
+        <div className="surface-card relative overflow-hidden p-6 md:p-8">
+            <div className="pointer-events-none absolute inset-0 bg-gradient-to-br from-brand-100/60 via-white/40 to-transparent" />
+            <div className="relative flex flex-col gap-2 md:flex-row md:items-center md:justify-between">
                 <div>
-                    <label htmlFor="topics" className="block text-sm font-medium text-gray-700 mb-2">
+                    <p className="text-sm font-semibold text-brand-600">Generador semanal</p>
+                    <h2 className="text-2xl md:text-3xl font-semibold leading-tight">Arma lotes curados en minutos</h2>
+                    <p className="mt-2 text-sm text-ink-600 max-w-2xl">
+                        Inyecta varios temas a la vez y deja que Laurio genere los bloques listos para reseñar,
+                        validar y publicar.
+                    </p>
+                </div>
+                <span className="pill bg-ink-900 text-white shadow-glow">IA asistida</span>
+            </div>
+
+            <form onSubmit={handleSubmit} className="relative mt-8 grid gap-6 md:grid-cols-2">
+                <div className="md:col-span-2">
+                    <label htmlFor="topics" className="flex items-center gap-2 text-xs font-semibold uppercase tracking-[0.08em] text-ink-600">
+                        <span className="h-2 w-2 rounded-full bg-brand-500" />
                         Temas (uno por línea)
                     </label>
-                    <textarea
-                        id="topics"
-                        value={topics}
-                        onChange={(e) => setTopics(e.target.value)}
-                        placeholder="Impacto de la IA en trabajos junior&#10;Habilidades blandas para el primer empleo&#10;Errores comunes al buscar práctica profesional"
-                        className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-                        rows={4}
-                        disabled={loading}
-                    />
+                    <div className="mt-2 rounded-2xl bg-white/90 p-[1px] shadow-inner shadow-white/40">
+                        <textarea
+                            id="topics"
+                            value={topics}
+                            onChange={(e) => setTopics(e.target.value)}
+                            placeholder="Impacto de la IA en trabajos junior&#10;Habilidades blandas para el primer empleo&#10;Errores comunes al buscar práctica profesional"
+                            className="input-shell h-36 resize-none bg-transparent"
+                            rows={4}
+                            disabled={loading}
+                        />
+                    </div>
+                    <p className="mt-2 text-xs text-ink-500">Tip: pega los temas desde tu research o backlog de marketing.</p>
                 </div>
 
-                <div>
-                    <label htmlFor="context" className="block text-sm font-medium text-gray-700 mb-2">
-                        Contexto
+                <div className="md:col-span-2">
+                    <label htmlFor="context" className="flex items-center gap-2 text-xs font-semibold uppercase tracking-[0.08em] text-ink-600">
+                        <span className="h-2 w-2 rounded-full bg-orange-400" />
+                        Contexto y tono
                     </label>
-                    <input
-                        id="context"
-                        type="text"
-                        value={context}
-                        onChange={(e) => setContext(e.target.value)}
-                        className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-                        disabled={loading}
-                    />
+                    <div className="mt-2 rounded-2xl bg-white/90 p-[1px] shadow-inner shadow-white/40">
+                        <input
+                            id="context"
+                            type="text"
+                            value={context}
+                            onChange={(e) => setContext(e.target.value)}
+                            className="input-shell bg-transparent"
+                            disabled={loading}
+                            placeholder="Audiencia joven, tono cercano y práctico"
+                        />
+                    </div>
+                    <p className="mt-2 text-xs text-ink-500">Usa tono, CTA clave o un marco (ej: PAS, enfoque educativo).</p>
                 </div>
 
                 {error && (
-                    <div className="bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded">
+                    <div className="md:col-span-2 rounded-2xl border border-red-200 bg-red-50/80 px-4 py-3 text-red-700 shadow-soft">
                         {error}
                     </div>
                 )}
 
                 {success && (
-                    <div className="bg-green-50 border border-green-200 text-green-700 px-4 py-3 rounded">
+                    <div className="md:col-span-2 rounded-2xl border border-green-200 bg-green-50/80 px-4 py-3 text-green-700 shadow-soft">
                         {success}
                     </div>
                 )}
 
-                <button
-                    type="submit"
-                    disabled={loading}
-                    className="w-full bg-blue-600 text-white py-2 px-4 rounded-md hover:bg-blue-700 disabled:bg-gray-400 disabled:cursor-not-allowed transition-colors font-medium"
-                >
-                    {loading ? '⏳ Generando contenido...' : '🚀 Generar Contenido'}
-                </button>
+                <div className="md:col-span-2 flex flex-col gap-3 md:flex-row md:items-center md:justify-between">
+                    <div className="flex items-center gap-2 text-xs text-ink-500">
+                        <span className="h-2 w-2 rounded-full bg-emerald-400" />
+                        Guardamos cada bloque en el backlog para pulirlo antes de publicar.
+                    </div>
+                    <button
+                        type="submit"
+                        disabled={loading}
+                        className="inline-flex items-center justify-center gap-2 rounded-full bg-gradient-to-r from-ink-900 via-ink-900 to-brand-600 px-6 py-3 text-sm font-semibold text-white shadow-glow transition hover:translate-y-[-1px] hover:shadow-xl disabled:translate-y-0 disabled:bg-slate-400 disabled:shadow-none"
+                    >
+                        {loading ? '⏳ Generando contenido...' : '🚀 Generar Contenido'}
+                    </button>
+                </div>
             </form>
         </div>
     );

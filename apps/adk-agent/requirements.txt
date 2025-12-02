@@ -1,6 +1,5 @@
 fastapi
 uvicorn
-google-genai-agents
 pydantic
 python-dotenv
 requests

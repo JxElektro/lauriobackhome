@@ -1,14 +1,17 @@
 'use client';
 
 import { useEffect, useState } from 'react';
+import { useRouter } from 'next/navigation';
 import { getBacklogItems } from '@/lib/api';
 import { BacklogItem } from '@laurio/shared';
 import Link from 'next/link';
+import BacklogTable from '@/components/BacklogTable';
 
 export default function BacklogPage() {
     const [items, setItems] = useState<BacklogItem[]>([]);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState<string | null>(null);
+    const router = useRouter();
 
     useEffect(() => {
         async function fetchItems() {
@@ -24,48 +27,40 @@ export default function BacklogPage() {
         fetchItems();
     }, []);
 
-    if (loading) return <div className="p-8">Loading...</div>;
-    if (error) return <div className="p-8 text-red-500">{error}</div>;
-
     return (
-        <div className="min-h-screen bg-gray-50 p-8">
-            <div className="max-w-6xl mx-auto">
-                <div className="flex justify-between items-center mb-8">
-                    <h1 className="text-3xl font-bold">Content Backlog</h1>
-                    <Link
-                        href="/generate"
-                        className="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700"
-                    >
-                        Generate New Content
-                    </Link>
+        <div className="min-h-screen pb-12">
+            <div className="mx-auto max-w-6xl px-4 pt-10 sm:px-6 lg:px-8">
+                <div className="surface-card relative overflow-hidden p-6">
+                    <div className="absolute inset-0 bg-gradient-to-br from-brand-50 via-white/70 to-orange-50 opacity-70" />
+                    <div className="relative flex items-center justify-between gap-4">
+                        <div>
+                            <p className="text-xs font-semibold uppercase tracking-[0.12em] text-ink-500">Backlog detallado</p>
+                            <h1 className="text-3xl font-semibold text-ink-900">Todas las piezas en cola</h1>
+                            <p className="text-sm text-ink-600">Explora el backlog completo sin filtros, ideal para auditorías rápidas.</p>
+                        </div>
+                        <Link
+                            href="/"
+                            className="pill border border-ink-900 bg-ink-900 text-white shadow-glow"
+                        >
+                            Dashboard
+                        </Link>
+                    </div>
                 </div>
 
-                {items.length === 0 ? (
-                    <div className="text-center py-12 text-gray-500">
-                        No items yet. Generate some content to get started!
-                    </div>
-                ) : (
-                    <div className="grid gap-4">
-                        {items.map((item) => (
-                            <div key={item.id} className="bg-white p-6 rounded-lg shadow">
-                                <div className="flex justify-between items-start mb-2">
-                                    <h3 className="text-xl font-semibold">{item.topic}</h3>
-                                    <span className={`px-3 py-1 rounded text-sm ${item.status === 'ready_for_review' ? 'bg-yellow-100 text-yellow-800' :
-                                            item.status === 'approved' ? 'bg-green-100 text-green-800' :
-                                                'bg-gray-100 text-gray-800'
-                                        }`}>
-                                        {item.status}
-                                    </span>
-                                </div>
-                                <p className="text-gray-600 mb-2">{item.mainMessage}</p>
-                                <div className="flex gap-4 text-sm text-gray-500">
-                                    <span>Type: {item.postType}</span>
-                                    <span>Audience: {item.targetAudience}</span>
-                                </div>
-                            </div>
-                        ))}
-                    </div>
-                )}
+                <div className="mt-6">
+                    {loading ? (
+                        <div className="surface-card flex flex-col items-center justify-center gap-3 py-12">
+                            <div className="h-10 w-10 animate-spin rounded-full border-2 border-brand-200 border-b-brand-600" />
+                            <p className="text-sm text-ink-600">Cargando backlog...</p>
+                        </div>
+                    ) : error ? (
+                        <div className="surface-card border border-red-200 bg-red-50/80 p-6 text-red-700">
+                            {error}
+                        </div>
+                    ) : (
+                        <BacklogTable items={items} onItemClick={(id) => router.push(`/backlog/${id}`)} />
+                    )}
+                </div>
             </div>
         </div>
     );

@@ -4,7 +4,8 @@
     "scripts": {
         "build": "nest build",
         "start": "nest start",
-        "start:dev": "nest start --watch"
+        "start:dev": "nest start --watch",
+        "test": "node --test tests/*.test.js"
     },
     "dependencies": {
         "@laurio/shared": "workspace:*",
