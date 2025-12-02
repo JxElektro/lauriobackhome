@@ -95,6 +95,69 @@
 
 ---
 
+## 🧭 ARQUITECTURA DEL SISTEMA Y FLUJO
+
+La solución está organizada en un monorepo PNPM con cuatro piezas principales que colaboran entre sí para generar, persistir y revisar contenido:
+
+- Frontend Next.js (`apps/fe-panel`) sirve la UI y consume la API REST del BFF.
+- BFF NestJS (`apps/bff-panel`) expone endpoints REST y persiste datos vía Prisma/SQLite.
+- Servicio de IA FastAPI (`apps/adk-agent`) orquesta agentes Scout/Curator/Editor/Visual.
+- Base de datos SQLite (archivo `apps/bff-panel/prisma/dev.db`) gestionada por Prisma.
+
+```mermaid
+flowchart LR
+  classDef svc fill:#fff,stroke:#111,stroke-width:1px
+  classDef ctrl fill:#eef,stroke:#445
+  classDef agent fill:#efe,stroke:#484
+  classDef db fill:#ffd,stroke:#665
+
+  subgraph FE[Frontend — Next.js (apps/fe-panel) : 3001]
+    FE_H(Home /backlog list)
+    FE_G(GenerateContentForm)
+    FE_D(BacklogDetail)
+  end
+
+  subgraph BFF[NestJS BFF (apps/bff-panel) : 3000]
+    BFF_CtrlB[BacklogController]
+    BFF_CtrlO[OrchestrationController]
+    BFF_SvcO[OrchestrationService]
+    BFF_SvcB[BacklogService]
+    BFF_Pr[PrismaService]
+  end
+
+  subgraph ADK[FastAPI ADK (apps/adk-agent) : 8000]
+    ADK_API[/POST /run-flow/]
+    Scout[ScoutAgent]
+    Curator[CuratorAgent]
+    Editor[EditorAgent]
+    Visual[VisualAgent]
+  end
+
+  subgraph DB[(SQLite) prisma/dev.db]
+    Tbl[(BacklogItem)]
+  end
+
+  FE_H -->|GET /backlog| BFF_CtrlB --> BFF_SvcB --> BFF_Pr --> Tbl
+  FE_D -->|PATCH /backlog/:id| BFF_CtrlB --> BFF_SvcB --> BFF_Pr --> Tbl
+  FE_G -->|POST /orchestrations/weekly-content| BFF_CtrlO --> BFF_SvcO -->|POST http://localhost:8000/run-flow| ADK_API
+  ADK_API --> Scout --> Curator --> Editor --> Visual --> ADK_API
+  ADK_API -->|results (topics, structure, prompts)| BFF_SvcO --> BFF_SvcB --> BFF_Pr --> Tbl -->|GET /backlog| FE_H
+```
+
+Descripción breve:
+- El usuario inicia generación desde el frontend (`/generate`), que envía `POST /orchestrations/weekly-content` al BFF.
+- El BFF llama al ADK (`POST /run-flow`) usando `PYTHON_AGENT_URL` (por defecto `http://localhost:8000`).
+- El ADK encadena agentes para producir insights, ideas, estructura y prompts visuales.
+- El BFF persiste los resultados en `BacklogItem` (Prisma/SQLite) y devuelve los items creados.
+- El frontend lista el backlog (`GET /backlog`) y permite actualizar estado y campos (`PATCH /backlog/:id`).
+
+Puertos y variables:
+- Frontend: `3001` y `NEXT_PUBLIC_API_URL` → `http://localhost:3000`.
+- BFF: `3000` (`apps/bff-panel/src/main.ts:7`) y `PYTHON_AGENT_URL` → `http://localhost:8000` (`apps/bff-panel/src/orchestration/orchestration.service.ts:19`).
+- ADK: `8000` (FastAPI).
+
+---
+
 # 📋 DOCUMENTO ORIGINAL - Especificación del Proyecto
 
 Eres una IA experta en arquitectura de software, Google Agent Development Kit (ADK), orquestación de agentes y desarrollo full-stack con TypeScript/Node.js y React. Tu tarea es DISEÑAR Y EMPEZAR A IMPLEMENTAR un sistema interno para una startup EdTech llamado “Laurio Content Backlog”, pensado para orquestar la generación de contenido (sobre futuro laboral y educación) para Instagram usando agentes ADK.

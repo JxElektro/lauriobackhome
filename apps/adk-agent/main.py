@@ -74,11 +74,19 @@ async def run_flow(request: FlowRequest):
                 visual_prompts = []
             source_insights = []
             if isinstance(insights, str) and insights:
-                source_insights = [{
-                    "sourceUrl": "https://example.com",
-                    "sourceTitle": "Mock source",
-                    "summary": insights[:200]
-                }]
+                import re
+                lines = [l.strip() for l in insights.split("\n") if l.strip()]
+                for l in lines:
+                    m = re.search(r"\((https?://[^)]+)\)", l)
+                    title = l.lstrip("- ")
+                    if ":" in title:
+                        title = title.split(":", 1)[0]
+                    url = m.group(1) if m else ""
+                    source_insights.append({
+                        "sourceUrl": url,
+                        "sourceTitle": title[:120],
+                        "summary": l[:240]
+                    })
             idea = ideas[0] if isinstance(ideas, list) and ideas else {
                 "postType": "ig_carousel",
                 "mainMessage": "",

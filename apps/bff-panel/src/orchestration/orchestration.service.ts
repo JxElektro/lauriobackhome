@@ -24,10 +24,20 @@ export class OrchestrationService {
         private readonly backlogService: BacklogService,
     ) { }
 
-    async runFlow(topics: string[], context?: string) {
+    async runFlow(topics: string[], context?: string, schedule?: { startAt?: string; intervalMinutes?: number }) {
         this.logger.log(`Starting flow for topics: ${topics.join(', ')}`);
 
         try {
+            const now = new Date();
+            const scheduleStart = (() => {
+                if (schedule?.startAt) {
+                    const d = new Date(schedule.startAt);
+                    return isNaN(d.getTime()) ? now : d;
+                }
+                const d = new Date();
+                d.setHours(6, 0, 0, 0);
+                return d;
+            })();
             // Call Python ADK with extended timeout
             const { data } = await firstValueFrom(
                 this.httpService.post(`${this.adkUrl}/run-flow`, {
@@ -42,7 +52,12 @@ export class OrchestrationService {
 
             // Process results and save to Backlog
             if (data.results && Array.isArray(data.results)) {
+                const base = scheduleStart;
+                const step = (schedule?.intervalMinutes ?? 120) * 60 * 1000;
+
+                let idx = 0;
                 for (const result of data.results as ADKResult[]) {
+                    const plannedDate = new Date(base.getTime() + idx * step);
                     const newItem = await this.backlogService.create({
                         topic: result.topic,
                         status: 'ready_for_review',
@@ -62,17 +77,24 @@ export class OrchestrationService {
                             : JSON.stringify(result.visualPrompts || []),
                         notes: `Generated from context: ${context || 'None'}`,
                     });
-                    createdItems.push(newItem);
-                    this.logger.log(`Created backlog item: ${newItem.id}`);
+                    // ensure plannedDate is persisted reliably
+                    const updatedItem = await this.backlogService.update(newItem.id, { plannedDate: { set: plannedDate } as any });
+                    idx += 1;
+                    createdItems.push(updatedItem);
+                    this.logger.log(`Created backlog item: ${updatedItem.id} scheduled at ${plannedDate.toISOString()}`);
                 }
             }
 
-            return {
-                status: 'success',
-                message: `Successfully generated ${createdItems.length} content items`,
-                createdItemsCount: createdItems.length,
-                items: createdItems,
-            };
+                return {
+                    status: 'success',
+                    message: `Successfully generated ${createdItems.length} content items`,
+                    createdItemsCount: createdItems.length,
+                    items: createdItems,
+                    schedule: {
+                    startAt: schedule?.startAt || scheduleStart.toISOString(),
+                    intervalMinutes: schedule?.intervalMinutes ?? 120,
+                },
+                };
 
         } catch (error) {
             this.logger.error('Error calling ADK service:', error.message);
