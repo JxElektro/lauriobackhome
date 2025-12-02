@@ -8,10 +8,10 @@ async function getText(url) {
   return { ok: res.ok, status: res.status, text: await res.text() }
 }
 
-test('Home renderiza Laurio Content Backlog', async () => {
+test('Home renderiza cabecera de Laurio Backoffice', async () => {
   const { ok, text } = await getText(`${FE}/`)
   assert.ok(ok)
-  assert.ok(text.includes('Laurio Content Backlog'))
+  assert.ok(text.includes('Laurio Backoffice'))
 })
 
 test('Backlog lista carga HTML base', async () => {

@@ -1,6 +1,8 @@
 'use client';
 
-import { useState, useEffect, useMemo, useCallback } from 'react';
+import { useMemo, useEffect, useState, useCallback } from 'react';
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import { faRocket } from '@fortawesome/free-solid-svg-icons';
 import { useRouter } from 'next/navigation';
 import { BacklogItem } from '@laurio/shared';
 import { getBacklogItems } from '@/lib/api';
@@ -158,7 +160,8 @@ export default function Home() {
                                 onClick={() => router.push('/generate')}
                                 className="inline-flex items-center gap-2 rounded-full bg-ink-900 px-5 py-3 text-sm font-semibold text-white shadow-glow transition hover:-translate-y-[1px]"
                             >
-                                🚀 Crear lote IA
+                                <FontAwesomeIcon icon={faRocket} />
+                                <span>Crear lote IA</span>
                             </button>
                             <button
                                 type="button"

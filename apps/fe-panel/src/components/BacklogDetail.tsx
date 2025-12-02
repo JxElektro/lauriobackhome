@@ -2,6 +2,8 @@
 
 import { useState, useEffect, useCallback } from 'react';
 import { useRouter } from 'next/navigation';
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import { faArrowLeft, faBullseye } from '@fortawesome/free-solid-svg-icons';
 import { BacklogItem } from '@laurio/shared';
 import { getBacklogItem, updateBacklogItem } from '@/lib/api';
 
@@ -49,9 +51,9 @@ export default function BacklogDetail({ id }: BacklogDetailProps) {
                 mainMessage: item.mainMessage,
                 notes: item.notes,
             });
-            alert('✅ Cambios guardados');
+            alert('Cambios guardados');
         } catch (err: any) {
-            alert('❌ Error al guardar: ' + err.message);
+            alert('Error al guardar: ' + err.message);
         } finally {
             setSaving(false);
         }
@@ -67,9 +69,10 @@ export default function BacklogDetail({ id }: BacklogDetailProps) {
                 <p className="text-red-600">Error: {error || 'Item no encontrado'}</p>
                 <button
                     onClick={() => router.push('/')}
-                    className="mt-4 text-blue-600 hover:underline"
+                    className="mt-4 inline-flex items-center gap-2 text-blue-600 hover:underline"
                 >
-                    ← Volver al listado
+                    <FontAwesomeIcon icon={faArrowLeft} />
+                    <span>Volver al listado</span>
                 </button>
             </div>
         );
@@ -100,7 +103,8 @@ export default function BacklogDetail({ id }: BacklogDetailProps) {
                         onClick={() => router.push('/')}
                         className="inline-flex items-center gap-2 rounded-full border border-slate-200 bg-white/80 px-4 py-2 text-sm font-semibold text-ink-800 transition hover:-translate-y-[1px] hover:border-brand-200 hover:text-ink-900"
                     >
-                        ← Volver
+                        <FontAwesomeIcon icon={faArrowLeft} />
+                        <span>Volver</span>
                     </button>
                     <div className="flex items-center gap-3">
                         <span className="pill border border-slate-200 bg-white/80 text-ink-700">
@@ -138,7 +142,7 @@ export default function BacklogDetail({ id }: BacklogDetailProps) {
                             )}
                         </div>
                         <div className="flex flex-wrap gap-2">
-                            <span className="pill border border-slate-200 bg-white/80 text-ink-700">🎯 Audiencia: {item.targetAudience}</span>
+                            <span className="pill border border-slate-200 bg-white/80 text-ink-700 inline-flex items-center gap-2"><FontAwesomeIcon icon={faBullseye} /><span>Audiencia: {item.targetAudience}</span></span>
                             <span className="pill border border-brand-200 bg-brand-50 text-brand-800">Tipo: {item.postType}</span>
                         </div>
                     </div>

@@ -1,6 +1,8 @@
 'use client';
 
 import { BacklogItem } from '@laurio/shared';
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import { faRocket, faCamera, faImage, faMobileScreenButton, faBullseye } from '@fortawesome/free-solid-svg-icons';
 
 interface BacklogTableProps {
     items: BacklogItem[];
@@ -12,7 +14,7 @@ export default function BacklogTable({ items, onItemClick }: BacklogTableProps) 
         return (
             <div className="surface-card text-center py-12">
                 <div className="mx-auto flex h-12 w-12 items-center justify-center rounded-2xl bg-brand-50 text-brand-600 shadow-inner shadow-white/40">
-                    🚀
+                    <FontAwesomeIcon icon={faRocket} />
                 </div>
                 <p className="mt-4 text-lg font-semibold text-ink-900">No hay items en el backlog</p>
                 <p className="mt-1 text-sm text-ink-600">Genera contenido con el formulario superior y aparecerá aquí al instante.</p>
@@ -28,10 +30,25 @@ export default function BacklogTable({ items, onItemClick }: BacklogTableProps) 
         posted: "bg-indigo-50 text-indigo-700 border border-indigo-100",
     };
 
-    const postTypeLabels: Record<string, string> = {
-        ig_carousel: "📸 Carrusel",
-        ig_post: "🖼️ Post",
-        story_snippet: "📱 Story",
+    const postTypeLabels: Record<string, JSX.Element> = {
+        ig_carousel: (
+            <span className="inline-flex items-center gap-2">
+                <FontAwesomeIcon icon={faCamera} />
+                <span>Carrusel</span>
+            </span>
+        ),
+        ig_post: (
+            <span className="inline-flex items-center gap-2">
+                <FontAwesomeIcon icon={faImage} />
+                <span>Post</span>
+            </span>
+        ),
+        story_snippet: (
+            <span className="inline-flex items-center gap-2">
+                <FontAwesomeIcon icon={faMobileScreenButton} />
+                <span>Story</span>
+            </span>
+        ),
     };
 
     const statusCopy: Record<string, string> = {
@@ -74,8 +91,9 @@ export default function BacklogTable({ items, onItemClick }: BacklogTableProps) 
                             <span className="pill bg-white/80 text-ink-800 border border-slate-200">
                                 {postTypeLabels[item.postType] || item.postType}
                             </span>
-                            <span className="pill bg-slate-100 text-ink-700 border border-slate-200">
-                                🎯 Audiencia: {item.targetAudience}
+                            <span className="pill bg-slate-100 text-ink-700 border border-slate-200 inline-flex items-center gap-2">
+                                <FontAwesomeIcon icon={faBullseye} />
+                                <span>Audiencia: {item.targetAudience}</span>
                             </span>
                             {item.notes ? (
                                 <span className="pill bg-emerald-50 text-emerald-700 border border-emerald-100">

@@ -1,6 +1,8 @@
 'use client';
 
 import { useState } from 'react';
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import { faRocket, faHourglass, faCircleCheck, faCircleExclamation } from '@fortawesome/free-solid-svg-icons';
 import { triggerFlow } from '@/lib/api';
 
 interface GenerateContentFormProps {
@@ -32,7 +34,7 @@ export default function GenerateContentForm({ onSuccess }: GenerateContentFormPr
             if (result.status === 'error') {
                 setError(result.error || result.message);
             } else {
-                setSuccess(`✅ ${result.message || `Se generaron ${result.createdItemsCount} items`}`);
+                setSuccess(result.message || `Se generaron ${result.createdItemsCount} items`);
                 setTopics('');
                 setTimeout(() => {
                     onSuccess();
@@ -100,14 +102,16 @@ export default function GenerateContentForm({ onSuccess }: GenerateContentFormPr
                 </div>
 
                 {error && (
-                    <div className="md:col-span-2 rounded-2xl border border-red-200 bg-red-50/80 px-4 py-3 text-red-700 shadow-soft">
-                        {error}
+                    <div className="md:col-span-2 flex items-center gap-2 rounded-2xl border border-red-200 bg-red-50/80 px-4 py-3 text-red-700 shadow-soft">
+                        <FontAwesomeIcon icon={faCircleExclamation} />
+                        <span>{error}</span>
                     </div>
                 )}
 
                 {success && (
-                    <div className="md:col-span-2 rounded-2xl border border-green-200 bg-green-50/80 px-4 py-3 text-green-700 shadow-soft">
-                        {success}
+                    <div className="md:col-span-2 flex items-center gap-2 rounded-2xl border border-green-200 bg-green-50/80 px-4 py-3 text-green-700 shadow-soft">
+                        <FontAwesomeIcon icon={faCircleCheck} />
+                        <span>{success}</span>
                     </div>
                 )}
 
@@ -121,7 +125,17 @@ export default function GenerateContentForm({ onSuccess }: GenerateContentFormPr
                         disabled={loading}
                         className="inline-flex items-center justify-center gap-2 rounded-full bg-gradient-to-r from-ink-900 via-ink-900 to-brand-600 px-6 py-3 text-sm font-semibold text-white shadow-glow transition hover:translate-y-[-1px] hover:shadow-xl disabled:translate-y-0 disabled:bg-slate-400 disabled:shadow-none"
                     >
-                        {loading ? '⏳ Generando contenido...' : '🚀 Generar Contenido'}
+                        {loading ? (
+                            <>
+                                <FontAwesomeIcon icon={faHourglass} />
+                                <span>Generando contenido...</span>
+                            </>
+                        ) : (
+                            <>
+                                <FontAwesomeIcon icon={faRocket} />
+                                <span>Generar Contenido</span>
+                            </>
+                        )}
                     </button>
                 </div>
             </form>

@@ -1,6 +1,8 @@
 'use client';
 
 import Link from 'next/link';
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import { faArrowLeft } from '@fortawesome/free-solid-svg-icons';
 import { useRouter } from 'next/navigation';
 import GenerateContentForm from '@/components/GenerateContentForm';
 
@@ -18,8 +20,9 @@ export default function GeneratePage() {
                             <h1 className="text-3xl font-semibold text-ink-900">Lanzar nuevos lotes</h1>
                             <p className="text-sm text-ink-600">Agrupa temas, define tono y envía al backlog listo para revisión.</p>
                         </div>
-                        <Link href="/backlog" className="pill border border-ink-900 bg-ink-900 text-white shadow-glow">
-                            ← Backlog
+                        <Link href="/backlog" className="pill border border-ink-900 bg-ink-900 text-white shadow-glow inline-flex items-center gap-2">
+                            <FontAwesomeIcon icon={faArrowLeft} />
+                            <span>Backlog</span>
                         </Link>
                     </div>
                 </div>
