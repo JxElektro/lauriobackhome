@@ -109,204 +109,114 @@ export default function Home() {
     }, [items]);
 
     return (
-        <div className="min-h-screen pb-16">
-            <div className="mx-auto max-w-7xl px-4 pt-10 sm:px-6 lg:px-8">
-                <section className="relative overflow-hidden surface-card p-6 md:p-8">
-                    <div className="absolute inset-0 bg-gradient-to-br from-brand-50 via-white/70 to-orange-50 opacity-70" />
-                    <div className="absolute right-10 top-10 h-28 w-28 rounded-full bg-brand-100 blur-2xl" />
-                    <div className="relative flex flex-col gap-6">
-                        <div className="flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
-                            <div>
-                                <p className="flex items-center gap-2 text-xs font-semibold uppercase tracking-[0.14em] text-ink-500">
-                                    <span className="h-[6px] w-[6px] rounded-full bg-brand-500" />
-                                    Laurio Backoffice
-                                </p>
-                                <h1 className="mt-2 text-3xl sm:text-4xl font-semibold leading-tight text-ink-900">
-                                    Operación creativa con IA: backlog, visuales y research a la mano
-                                </h1>
-                                <p className="mt-2 max-w-2xl text-sm text-ink-600">
-                                    Carga temas, recibe prompts visuales y revisa insights reales en un solo panel
-                                    pensado para marketing. Todo queda listo para reseña o publicación.
-                                </p>
-                            </div>
-                            <div className="flex items-center gap-3 rounded-full bg-white/90 px-4 py-2 shadow-soft">
-                                <span className="h-2 w-2 rounded-full bg-emerald-400" />
-                                <div>
-                                    <p className="text-xs text-ink-500">Backlog sincronizado</p>
-                                    <p className="text-sm font-semibold text-ink-900">{items.length || '0'} items activos</p>
-                                </div>
-                            </div>
-                        </div>
-
-                        <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-5">
-                            {stats.map((stat) => (
-                                <div
-                                    key={stat.label}
-                                    className="flex items-center justify-between rounded-2xl bg-white/80 px-4 py-3 shadow-inner shadow-white/40 ring-1 ring-white/60"
-                                >
-                                    <div>
-                                        <p className="text-xs text-ink-500">{stat.label}</p>
-                                        <p className="text-xl font-semibold text-ink-900">{stat.value}</p>
-                                        <p className="text-[11px] text-ink-500">{stat.hint}</p>
-                                    </div>
-                                    <span className={`pill ${stat.accent}`}>{stat.label.split(' ')[0]}</span>
-                                </div>
-                            ))}
-                        </div>
-
-                        <div className="flex flex-wrap gap-3">
-                            <button
-                                type="button"
-                                onClick={() => router.push('/generate')}
-                                className="inline-flex items-center gap-2 rounded-full bg-ink-900 px-5 py-3 text-sm font-semibold text-white shadow-glow transition hover:-translate-y-[1px]"
-                            >
-                                <FontAwesomeIcon icon={faRocket} />
-                                <span>Crear lote IA</span>
-                            </button>
-                            <button
-                                type="button"
-                                onClick={() => router.push('/backlog')}
-                                className="inline-flex items-center gap-2 rounded-full border border-brand-200 bg-brand-50 px-5 py-3 text-sm font-semibold text-brand-800 hover:-translate-y-[1px]"
-                            >
-                                🎯 Ver temas activos
-                            </button>
-                            <button
-                                type="button"
-                                onClick={() => {
-                                    const element = document.getElementById('visual-feed');
-                                    if (element) element.scrollIntoView({ behavior: 'smooth' });
-                                }}
-                                className="inline-flex items-center gap-2 rounded-full border border-slate-200 bg-white/80 px-5 py-3 text-sm font-semibold text-ink-800 hover:-translate-y-[1px]"
-                            >
-                                🖼️ Revisar prompts visuales
-                            </button>
-                        </div>
-                    </div>
-                </section>
-
-                <section className="mt-8 grid gap-6 lg:grid-cols-[1.45fr,1fr]">
-                    <div className="space-y-4">
-                        <div className="surface-card p-4 sm:p-5">
-                            <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
-                                <div>
-                                    <p className="text-xs uppercase tracking-[0.12em] text-ink-500">Filtros rápidos</p>
-                                    <h3 className="text-lg font-semibold text-ink-900">Enfoca el backlog</h3>
-                                    <p className="text-sm text-ink-600">Aplica estados o tipo de pieza sin perder el contexto.</p>
-                                </div>
-                                <button
-                                    type="button"
-                                    onClick={() => {
-                                        setStatusFilter('');
-                                        setPostTypeFilter('');
-                                    }}
-                                    className="text-sm font-semibold text-brand-700 hover:text-brand-800"
-                                >
-                                    Limpiar filtros
-                                </button>
-                            </div>
-                            <div className="mt-4 grid gap-4 md:grid-cols-2">
-                                <div className="flex flex-wrap gap-2">
-                                    {statusOptions.map((option) => {
-                                        const active = statusFilter === option.value;
-                                        return (
-                                            <button
-                                                type="button"
-                                                key={option.value || 'all'}
-                                                onClick={() => setStatusFilter(option.value)}
-                                                className={`pill border ${active ? 'border-brand-300 bg-brand-50 text-brand-800 shadow-glow' : 'border-slate-200 bg-white/80 text-ink-700'} transition hover:-translate-y-[1px]`}
-                                            >
-                                                {option.label}
-                                            </button>
-                                        );
-                                    })}
-                                </div>
-                                <div className="flex flex-wrap gap-2">
-                                    {typeOptions.map((option) => {
-                                        const active = postTypeFilter === option.value;
-                                        return (
-                                            <button
-                                                type="button"
-                                                key={option.value || 'all-types'}
-                                                onClick={() => setPostTypeFilter(option.value)}
-                                                className={`pill border ${active ? 'border-ink-900 bg-ink-900 text-white shadow-glow' : 'border-slate-200 bg-white/80 text-ink-700'} transition hover:-translate-y-[1px]`}
-                                            >
-                                                {option.label}
-                                            </button>
-                                        );
-                                    })}
-                                </div>
-                            </div>
-                        </div>
-
-                        {loading ? (
-                            <div className="surface-card flex flex-col items-center justify-center gap-3 py-12">
-                                <div className="h-10 w-10 animate-spin rounded-full border-2 border-brand-200 border-b-brand-600" />
-                                <p className="text-sm text-ink-600">Cargando backlog...</p>
-                            </div>
-                        ) : (
-                            <BacklogTable items={items} onItemClick={handleItemClick} />
-                        )}
-                    </div>
-
-                    <div className="lg:sticky lg:top-6 space-y-4">
-                        <GenerateContentForm onSuccess={loadItems} />
-
-                        <div id="visual-feed" className="surface-card p-5">
-                            <div className="flex items-center justify-between gap-2">
-                                <div>
-                                    <p className="text-xs uppercase tracking-[0.12em] text-ink-500">Prompts visuales</p>
-                                    <h3 className="text-lg font-semibold text-ink-900">Guía para imagen / video</h3>
-                                    <p className="text-sm text-ink-600">Saca quick wins para Midjourney o DALL·E basados en los temas reales.</p>
-                                </div>
-                                <span className="pill border border-slate-200 bg-white/80 text-ink-700">{visualInspo.length || 0} ideas</span>
-                            </div>
-                            <div className="mt-3 space-y-3">
-                                {visualInspo.length === 0 ? (
-                                    <p className="text-sm text-ink-600">Aún no hay prompts visuales. Genera contenido para ver sugerencias.</p>
-                                ) : (
-                                    visualInspo.map((prompt, idx) => (
-                                        <div key={idx} className="rounded-2xl border border-slate-200 bg-white/80 p-3 shadow-inner shadow-white/40">
-                                            <p className="text-xs font-semibold uppercase tracking-[0.08em] text-brand-700">Tema: {prompt.topic}</p>
-                                            <p className="mt-1 text-sm text-ink-700">{prompt.description}</p>
-                                        </div>
-                                    ))
-                                )}
-                            </div>
-                        </div>
-
-                        <div className="surface-card p-5">
-                            <div className="flex items-center justify-between gap-2">
-                                <div>
-                                    <p className="text-xs uppercase tracking-[0.12em] text-ink-500">Insights reales</p>
-                                    <h3 className="text-lg font-semibold text-ink-900">Fuentes curadas</h3>
-                                    <p className="text-sm text-ink-600">Enlaces y resúmenes que respaldan las piezas del backlog.</p>
-                                </div>
-                                <span className="pill border border-emerald-200 bg-emerald-50 text-emerald-800">{insightFeed.length || 0} fuentes</span>
-                            </div>
-                            <div className="mt-3 space-y-3">
-                                {insightFeed.length === 0 ? (
-                                    <p className="text-sm text-ink-600">Genera contenido para poblar el feed de research.</p>
-                                ) : (
-                                    insightFeed.map((insight, idx) => (
-                                        <div key={idx} className="rounded-2xl border border-slate-200 bg-white/80 p-3 shadow-inner shadow-white/40">
-                                            <a
-                                                href={insight.sourceUrl}
-                                                target="_blank"
-                                                rel="noopener noreferrer"
-                                                className="text-sm font-semibold text-brand-700 hover:text-brand-800"
-                                            >
-                                                {insight.sourceTitle}
-                                            </a>
-                                            <p className="text-xs text-ink-500">Tema: {insight.topic}</p>
-                                            <p className="mt-1 text-sm text-ink-700">{insight.summary}</p>
-                                        </div>
-                                    ))
-                                )}
-                            </div>
-                        </div>
-                    </div>
-                </section>
+        <div className="space-y-8">
+            {/* Header Section */}
+            <div className="flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
+                <div>
+                    <h1 className="text-2xl font-bold text-ink-900">Panel de Control</h1>
+                    <p className="text-sm text-ink-500">Resumen de tu operación de contenido.</p>
+                </div>
+                <div className="flex items-center gap-3">
+                    <button
+                        onClick={() => router.push('/generate')}
+                        className="inline-flex items-center gap-2 rounded-xl bg-ink-900 px-4 py-2.5 text-sm font-semibold text-white shadow-lg shadow-ink-900/20 transition-transform hover:scale-[1.02] active:scale-[0.98]"
+                    >
+                        <FontAwesomeIcon icon={faRocket} />
+                        <span>Nuevo Lote</span>
+                    </button>
+                </div>
             </div>
+
+            {/* Stats Grid */}
+            <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-5">
+                {stats.map((stat) => (
+                    <div
+                        key={stat.label}
+                        className="group relative overflow-hidden rounded-2xl bg-white p-4 shadow-sm transition-all hover:shadow-md border border-slate-100"
+                    >
+                        <div className={`absolute right-0 top-0 h-16 w-16 -translate-y-1/2 translate-x-1/2 rounded-full opacity-10 ${stat.accent.split(' ')[0].replace('bg-', 'bg-')}`} />
+                        <p className="text-xs font-medium text-ink-500">{stat.label}</p>
+                        <p className="mt-1 text-2xl font-bold text-ink-900">{stat.value}</p>
+                        <p className="mt-1 text-[10px] text-ink-400">{stat.hint}</p>
+                    </div>
+                ))}
+            </div>
+
+            {/* Content Feed Section */}
+            <section className="grid gap-6 lg:grid-cols-[1.45fr,1fr]">
+                <div className="space-y-4">
+                    <div className="rounded-3xl bg-white p-1 shadow-sm border border-slate-100">
+                        <div className="flex items-center justify-between px-4 py-3">
+                            <h3 className="font-semibold text-ink-900">Backlog Reciente</h3>
+                            <div className="flex gap-2">
+                                <select 
+                                    value={statusFilter}
+                                    onChange={(e) => setStatusFilter(e.target.value)}
+                                    className="rounded-lg border-none bg-slate-50 px-3 py-1.5 text-xs font-medium text-ink-600 focus:ring-2 focus:ring-brand-500/20"
+                                >
+                                    {statusOptions.map(opt => <option key={opt.value} value={opt.value}>{opt.label}</option>)}
+                                </select>
+                            </div>
+                        </div>
+                        <div className="px-1 pb-1">
+                            <BacklogTable items={items} loading={loading} onItemClick={handleItemClick} />
+                        </div>
+                    </div>
+                </div>
+
+                {/* Sidebar / Insights */}
+                <div className="space-y-6">
+                    {/* Visual Inspiration Feed */}
+                    <div id="visual-feed" className="rounded-3xl bg-white p-5 shadow-sm border border-slate-100">
+                        <h3 className="mb-4 font-semibold text-ink-900">Prompts Visuales (Inspiración)</h3>
+                        <div className="space-y-4">
+                            {visualInspo.length > 0 ? (
+                                visualInspo.map((prompt: any, i) => (
+                                    <div key={i} className="group relative overflow-hidden rounded-xl bg-slate-900 p-4 text-white shadow-md transition-transform hover:scale-[1.01]">
+                                        <div className="absolute inset-0 bg-gradient-to-br from-brand-500/20 to-purple-600/20" />
+                                        <p className="relative mb-2 text-[10px] font-bold uppercase tracking-wider opacity-60">
+                                            {(prompt.topic || '').substring(0, 20)}...
+                                        </p>
+                                        <p className="relative text-xs leading-relaxed opacity-90">
+                                            &quot;{(prompt.prompt || '').substring(0, 120)}...&quot;
+                                        </p>
+                                    </div>
+                                ))
+                            ) : (
+                                <div className="flex h-32 flex-col items-center justify-center rounded-xl border border-dashed border-slate-200 bg-slate-50 text-center">
+                                    <p className="text-xs text-ink-400">Sin visuales aún</p>
+                                </div>
+                            )}
+                        </div>
+                    </div>
+
+                    {/* Research Insights */}
+                    <div className="rounded-3xl bg-white p-5 shadow-sm border border-slate-100">
+                        <h3 className="mb-4 font-semibold text-ink-900">Insights Detectados</h3>
+                        <div className="space-y-3">
+                            {insightFeed.length > 0 ? (
+                                insightFeed.map((insight: any, i) => (
+                                    <div key={i} className="rounded-xl bg-brand-50/50 p-3 transition-colors hover:bg-brand-50">
+                                        <div className="mb-1 flex items-center justify-between">
+                                            <span className="text-[10px] font-bold text-brand-600 uppercase">Source</span>
+                                            {insight.sourceUrl && (
+                                                <a href={insight.sourceUrl} target="_blank" rel="noopener noreferrer" className="text-[10px] text-brand-400 hover:underline">
+                                                    Link ↗
+                                                </a>
+                                            )}
+                                        </div>
+                                        <p className="text-xs font-medium text-ink-800 line-clamp-2">{insight.summary}</p>
+                                    </div>
+                                ))
+                            ) : (
+                                <div className="text-center text-xs text-ink-400 py-4">
+                                    Genera contenido para ver insights
+                                </div>
+                            )}
+                        </div>
+                    </div>
+                </div>
+            </section>
         </div>
     );
 }

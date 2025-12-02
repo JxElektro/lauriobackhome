@@ -6,10 +6,30 @@ import { faRocket, faCamera, faImage, faMobileScreenButton, faBullseye } from '@
 
 interface BacklogTableProps {
     items: BacklogItem[];
+    loading?: boolean;
     onItemClick: (id: string) => void;
 }
 
-export default function BacklogTable({ items, onItemClick }: BacklogTableProps) {
+export default function BacklogTable({ items, loading, onItemClick }: BacklogTableProps) {
+    if (loading) {
+        return (
+            <div className="grid gap-4">
+                {[1, 2, 3].map((i) => (
+                    <div key={i} className="surface-card h-32 animate-pulse bg-slate-50/50 p-6">
+                        <div className="flex justify-between">
+                            <div className="space-y-3">
+                                <div className="h-4 w-32 rounded-full bg-slate-200" />
+                                <div className="h-6 w-64 rounded-lg bg-slate-200" />
+                            </div>
+                            <div className="h-6 w-20 rounded-full bg-slate-200" />
+                        </div>
+                        <div className="mt-4 h-4 w-full max-w-md rounded bg-slate-200" />
+                    </div>
+                ))}
+            </div>
+        );
+    }
+
     if (items.length === 0) {
         return (
             <div className="surface-card text-center py-12">

@@ -38,13 +38,17 @@ export async function updateBacklogItem(id: string, data: Partial<BacklogItem>):
     return response.json();
 }
 
-export async function triggerFlow(topics: string[], context?: string): Promise<any> {
+export async function triggerFlow(
+    topics: string[], 
+    context?: string, 
+    schedule?: { startAt?: string; intervalMinutes?: number }
+): Promise<any> {
     const response = await fetch(`${API_BASE_URL}/orchestrations/weekly-content`, {
         method: 'POST',
         headers: {
             'Content-Type': 'application/json',
         },
-        body: JSON.stringify({ topics, context }),
+        body: JSON.stringify({ topics, context, schedule }),
     });
     if (!response.ok) {
         throw new Error('Failed to trigger flow');

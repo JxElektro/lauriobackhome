@@ -48,17 +48,16 @@ export default function BacklogPage() {
                 </div>
 
                 <div className="mt-6">
-                    {loading ? (
-                        <div className="surface-card flex flex-col items-center justify-center gap-3 py-12">
-                            <div className="h-10 w-10 animate-spin rounded-full border-2 border-brand-200 border-b-brand-600" />
-                            <p className="text-sm text-ink-600">Cargando backlog...</p>
-                        </div>
-                    ) : error ? (
+                    {error ? (
                         <div className="surface-card border border-red-200 bg-red-50/80 p-6 text-red-700">
                             {error}
                         </div>
                     ) : (
-                        <BacklogTable items={items} onItemClick={(id) => router.push(`/backlog/${id}`)} />
+                        <BacklogTable 
+                            items={items} 
+                            loading={loading}
+                            onItemClick={(id) => router.push(`/backlog/${id}`)} 
+                        />
                     )}
                 </div>
             </div>
