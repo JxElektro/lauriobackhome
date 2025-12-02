@@ -51,7 +51,23 @@ export async function triggerFlow(
         body: JSON.stringify({ topics, context, schedule }),
     });
     if (!response.ok) {
-        throw new Error('Failed to trigger flow');
+        const errorData = await response.json();
+        return { status: 'error', message: errorData.message || 'Failed to trigger flow' };
+    }
+    return response.json();
+}
+
+export async function triggerDailyMix(): Promise<any> {
+    // We call BFF which then calls ADK
+    const response = await fetch(`${API_BASE_URL}/orchestrations/daily-mix`, {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+        },
+    });
+    if (!response.ok) {
+        const errorData = await response.json();
+        return { status: 'error', message: errorData.message || 'Failed to trigger daily mix' };
     }
     return response.json();
 }

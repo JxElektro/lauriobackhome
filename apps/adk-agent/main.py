@@ -53,7 +53,7 @@ async def run_flow(request: FlowRequest):
             
             print(f"--- Generating visuals ---")
             visual_response = visual.run(f"Generate visual prompts for this draft: {draft}")
-            visuals = visual_response.text
+            visuals_json = visual_response.text
             import json
             try:
                 ideas = json.loads(ideas_json)
@@ -68,10 +68,19 @@ async def run_flow(request: FlowRequest):
                 structure_obj = json.loads(draft)
             except Exception:
                 structure_obj = {"slides": []}
+            
+            visual_prompts = []
+            ascii_art = ""
             try:
-                visual_prompts = json.loads(visuals)
+                visual_data = json.loads(visuals_json)
+                if isinstance(visual_data, list):
+                    visual_prompts = visual_data
+                elif isinstance(visual_data, dict):
+                    visual_prompts = visual_data.get("prompts", [])
+                    ascii_art = visual_data.get("asciiArt", "")
             except Exception:
                 visual_prompts = []
+
             source_insights = []
             if isinstance(insights, str) and insights:
                 import re
@@ -100,7 +109,8 @@ async def run_flow(request: FlowRequest):
                 "objective": idea.get("objective", "Generated via ADK"),
                 "sourceInsights": source_insights,
                 "structure": structure_obj,
-                "visualPrompts": visual_prompts
+                "visualPrompts": visual_prompts,
+                "visualMock": ascii_art
             })
             
         except Exception as e:
@@ -109,6 +119,92 @@ async def run_flow(request: FlowRequest):
                 "topic": topic,
                 "error": str(e)
             })
+
+    return {"status": "success", "results": results}
+
+@app.post("/run-daily")
+async def run_daily():
+    results = []
+    
+    # Initialize agents
+    scout = create_scout_agent()
+    curator = create_curator_agent()
+    editor = create_editor_agent()
+    visual = create_visual_agent()
+
+    try:
+        # Step 1: Scout for daily news
+        print(f"--- Scouting daily news ---")
+        import datetime
+        today = datetime.date.today().strftime("%Y-%m-%d")
+        scout_response = scout.run(f"Find top 5 trending news today ({today}) related to AI, Tech, and Future of Work. Focus on substantial stories.")
+        insights = scout_response.text
+        
+        # Step 2: Curator - Pick exactly 3 and structure them
+        print(f"--- Curating top 3 stories ---")
+        curator_response = curator.run(f"Context: Daily News Mix {today}\nInsights: {insights}\nRequirement: Select exactly 3 distinct stories. Create one post idea for each.")
+        ideas_json = curator_response.text
+        
+        import json
+        try:
+            ideas = json.loads(ideas_json)
+            if not isinstance(ideas, list):
+                ideas = [ideas]
+        except Exception:
+            ideas = []
+            
+        # Ensure we process up to 3 ideas
+        for i, idea in enumerate(ideas[:3]):
+            try:
+                print(f"--- Processing Idea {i+1}/3: {idea.get('mainMessage', 'Untitled')} ---")
+                
+                # Step 3: Editor
+                editor_response = editor.run(f"Draft content for this idea: {json.dumps(idea)}")
+                draft = editor_response.text
+                
+                # Step 4: Visual
+                visual_response = visual.run(f"Generate visual prompts for this draft: {draft}")
+                visuals_json = visual_response.text
+                
+                # Step 5: Schedule (Simple logic: Today + 2h, +5h, +8h)
+                now = datetime.datetime.now()
+                planned_date = (now + datetime.timedelta(hours=2 + (i*3))).isoformat()
+
+                # Parse results
+                try:
+                    structure_obj = json.loads(draft)
+                except:
+                    structure_obj = {"slides": []}
+                
+                visual_prompts = []
+                ascii_art = ""
+                try:
+                    visual_data = json.loads(visuals_json)
+                    if isinstance(visual_data, dict):
+                        visual_prompts = visual_data.get("prompts", [])
+                        ascii_art = visual_data.get("asciiArt", "")
+                    elif isinstance(visual_data, list):
+                        visual_prompts = visual_data
+                except:
+                    pass
+
+                results.append({
+                    "topic": idea.get("mainMessage", "Daily News"),
+                    "postType": idea.get("postType", "ig_post"),
+                    "mainMessage": idea.get("mainMessage", ""),
+                    "objective": idea.get("objective", "News Update"),
+                    "targetAudience": idea.get("targetAudience", "General"),
+                    "structure": structure_obj,
+                    "visualPrompts": visual_prompts,
+                    "visualMock": ascii_art,
+                    "plannedDate": planned_date,
+                    "status": "drafting"
+                })
+            except Exception as e:
+                print(f"Error processing idea {i}: {e}")
+
+    except Exception as e:
+        return {"status": "error", "message": str(e)}
 
     return {"status": "success", "results": results}
 

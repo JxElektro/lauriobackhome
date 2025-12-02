@@ -2,12 +2,14 @@
 
 import { usePathname, useRouter } from 'next/navigation';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import { startTutorial } from '@/lib/tutorial';
 import { 
     faHome, 
     faLayerGroup, 
     faWandMagicSparkles, 
     faChartPie,
-    faGear
+    faGear,
+    faCircleQuestion
 } from '@fortawesome/free-solid-svg-icons';
 
 export default function Sidebar() {
@@ -34,6 +36,7 @@ export default function Sidebar() {
                         return (
                             <li key={item.path}>
                                 <button
+                                    id={`nav-${item.label.toLowerCase()}`}
                                     onClick={() => router.push(item.path)}
                                     className={`group flex w-full items-center rounded-xl p-3 transition-all ${
                                         isActive 
@@ -69,6 +72,15 @@ export default function Sidebar() {
                     </div>
                     
                     <ul className="space-y-2 border-t border-slate-200 pt-4 font-medium">
+                        <li>
+                            <button 
+                                onClick={() => startTutorial()}
+                                className="group flex w-full items-center rounded-xl p-3 text-ink-600 transition-all hover:bg-slate-100 hover:text-ink-900"
+                            >
+                                <FontAwesomeIcon icon={faCircleQuestion} className="h-5 w-5 text-ink-400 group-hover:text-ink-600" />
+                                <span className="ml-3">Tutorial</span>
+                            </button>
+                        </li>
                         <li>
                             <button className="group flex w-full items-center rounded-xl p-3 text-ink-600 transition-all hover:bg-slate-100 hover:text-ink-900">
                                 <FontAwesomeIcon icon={faGear} className="h-5 w-5 text-ink-400 group-hover:text-ink-600" />

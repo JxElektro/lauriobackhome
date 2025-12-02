@@ -20,6 +20,7 @@ model BacklogItem {
   sourceInsights String?
   structure      String?
   visualPrompts  String?
+  visualMock     String?
   notes          String?
   plannedDate    DateTime?
 }

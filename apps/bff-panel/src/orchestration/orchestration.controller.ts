@@ -9,4 +9,9 @@ export class OrchestrationController {
     async generateWeeklyContent(@Body() body: { topics: string[]; context?: string; schedule?: { startAt?: string; intervalMinutes?: number } }) {
         return this.orchestrationService.runFlow(body.topics, body.context, body.schedule);
     }
+
+    @Post('daily-mix')
+    async generateDailyMix() {
+        return this.orchestrationService.runDailyMix();
+    }
 }

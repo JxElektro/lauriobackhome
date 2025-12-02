@@ -1,6 +1,8 @@
 import type { Metadata } from "next";
 import { Space_Grotesk, Sora } from "next/font/google";
 import Sidebar from "@/components/Sidebar";
+import TutorialInit from "@/components/TutorialInit";
+import "driver.js/dist/driver.css";
 import "./globals.css";
 
 const spaceGrotesk = Space_Grotesk({
@@ -29,6 +31,7 @@ export default function RootLayout({
     return (
         <html lang="en">
             <body className={`${spaceGrotesk.variable} ${sora.variable} antialiased bg-[#f6f7fb] text-ink-800`}>
+                <TutorialInit />
                 <div className="flex min-h-screen bg-mesh">
                     <Sidebar />
                     <div className="flex-1 transition-all sm:ml-64">

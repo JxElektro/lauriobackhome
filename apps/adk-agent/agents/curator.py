@@ -13,6 +13,18 @@ except Exception:
                     "mainMessage": "Consejos clave para el primer empleo",
                     "objective": "Educar",
                     "targetAudience": "youth"
+                },
+                {
+                    "postType": "ig_carousel",
+                    "mainMessage": "IA en el aula: cómo empezar sin costo",
+                    "objective": "Informar",
+                    "targetAudience": "teachers"
+                },
+                {
+                    "postType": "ig_carousel",
+                    "mainMessage": "Habilidades 2025: qué buscan las empresas",
+                    "objective": "Orientar",
+                    "targetAudience": "youth"
                 }
             ]
             return SimpleNamespace(text=__import__("json").dumps(ideas))

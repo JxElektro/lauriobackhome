@@ -10,10 +10,11 @@
         "test": "node --test tests/*.test.js"
     },
     "dependencies": {
-        "@laurio/shared": "workspace:*",
-        "next": "14.2.3",
-        "@fortawesome/react-fontawesome": "^0.2.1",
         "@fortawesome/free-solid-svg-icons": "^6.6.0",
+        "@fortawesome/react-fontawesome": "^0.2.1",
+        "@laurio/shared": "workspace:*",
+        "driver.js": "^1.4.0",
+        "next": "14.2.3",
         "react": "^18",
         "react-dom": "^18"
     },

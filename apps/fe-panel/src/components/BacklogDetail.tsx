@@ -3,7 +3,7 @@
 import { useState, useEffect, useCallback } from 'react';
 import { useRouter } from 'next/navigation';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faArrowLeft, faBullseye } from '@fortawesome/free-solid-svg-icons';
+import { faArrowLeft, faBullseye, faCheck, faImage } from '@fortawesome/free-solid-svg-icons';
 import { BacklogItem } from '@laurio/shared';
 import { getBacklogItem, updateBacklogItem } from '@/lib/api';
 
@@ -54,6 +54,28 @@ export default function BacklogDetail({ id }: BacklogDetailProps) {
             alert('Cambios guardados');
         } catch (err: any) {
             alert('Error al guardar: ' + err.message);
+        } finally {
+            setSaving(false);
+        }
+    };
+
+    const handleApprove = async () => {
+        if (!item) return;
+        
+        if (!confirm('¿Estás seguro de aprobar este contenido para publicación?')) return;
+
+        setSaving(true);
+        try {
+            const newItem = { ...item, status: 'approved' as const };
+            setItem(newItem);
+            await updateBacklogItem(id, {
+                status: 'approved',
+                mainMessage: item.mainMessage,
+                notes: item.notes,
+            });
+            alert('Contenido aprobado exitosamente');
+        } catch (err: any) {
+            alert('Error al aprobar: ' + err.message);
         } finally {
             setSaving(false);
         }
@@ -116,10 +138,20 @@ export default function BacklogDetail({ id }: BacklogDetailProps) {
                         <button
                             onClick={handleSave}
                             disabled={saving}
-                            className="inline-flex items-center gap-2 rounded-full bg-gradient-to-r from-ink-900 to-brand-600 px-5 py-2 text-sm font-semibold text-white shadow-glow transition hover:-translate-y-[1px] disabled:translate-y-0 disabled:bg-slate-400 disabled:shadow-none"
+                            className="inline-flex items-center gap-2 rounded-full border border-slate-200 bg-white px-5 py-2 text-sm font-semibold text-ink-700 transition hover:bg-slate-50 disabled:opacity-50"
                         >
-                            {saving ? 'Guardando...' : 'Guardar Cambios'}
+                            {saving ? 'Guardando...' : 'Guardar'}
                         </button>
+                        {item.status !== 'approved' && item.status !== 'posted' && (
+                            <button
+                                onClick={handleApprove}
+                                disabled={saving}
+                                className="inline-flex items-center gap-2 rounded-full bg-gradient-to-r from-brand-600 to-brand-500 px-5 py-2 text-sm font-semibold text-white shadow-glow transition hover:-translate-y-[1px] hover:shadow-lg hover:shadow-brand-500/30 disabled:translate-y-0 disabled:opacity-50"
+                            >
+                                <FontAwesomeIcon icon={faCheck} />
+                                <span>Aprobar</span>
+                            </button>
+                        )}
                     </div>
                 </div>
             </div>
@@ -165,6 +197,28 @@ export default function BacklogDetail({ id }: BacklogDetailProps) {
                     </div>
                 </div>
             </div>
+
+            {item.visualMock && (
+                <div className="surface-card p-6">
+                    <div className="flex items-center gap-3 mb-4">
+                        <div className="flex h-10 w-10 items-center justify-center rounded-full bg-indigo-100 text-indigo-600">
+                            <FontAwesomeIcon icon={faImage} />
+                        </div>
+                        <div>
+                            <p className="text-xs uppercase tracking-[0.12em] text-ink-500">Mockup Visual</p>
+                            <h2 className="text-xl font-semibold text-ink-900">Previsualización del Post</h2>
+                        </div>
+                    </div>
+                    <div className="bg-slate-900 rounded-xl p-6 overflow-x-auto shadow-inner">
+                        <pre className="font-mono text-xs sm:text-sm md:text-base text-emerald-400 leading-relaxed whitespace-pre-wrap text-center">
+                            {item.visualMock}
+                        </pre>
+                    </div>
+                    <p className="mt-3 text-xs text-ink-500 text-center">
+                        * Esta es una representación esquemática generada por IA. La imagen final se generará en alta resolución.
+                    </p>
+                </div>
+            )}
 
             <div className="surface-card space-y-6 p-6">
                 <div className="flex flex-col gap-2">
@@ -250,10 +304,18 @@ export default function BacklogDetail({ id }: BacklogDetailProps) {
                                     <span className="pill border border-brand-200 bg-brand-50 text-brand-800">Slide {slide.id}</span>
                                     <span className="text-xs text-ink-500">{slide.role}</span>
                                 </div>
-                                <p className="mt-2 text-sm text-ink-700">{slide.text}</p>
+                                <p className="mt-2 whitespace-pre-wrap text-sm text-ink-700">{slide.text}</p>
                             </div>
                         ))}
                     </div>
+                </div>
+            )}
+
+            {structure?.caption && (
+                <div className="surface-card p-6">
+                    <p className="text-xs uppercase tracking-[0.12em] text-ink-500">Descripción del post</p>
+                    <h2 className="text-xl font-semibold text-ink-900">Caption</h2>
+                    <p className="mt-2 whitespace-pre-wrap text-sm text-ink-700">{structure.caption}</p>
                 </div>
             )}
 

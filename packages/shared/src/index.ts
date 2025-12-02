@@ -28,6 +28,7 @@ export interface BacklogItem {
         forSlide?: number | null;
         description: string;
     }[];
+    visualMock?: string;
     notes?: string;
     plannedDate?: string | null;
 }

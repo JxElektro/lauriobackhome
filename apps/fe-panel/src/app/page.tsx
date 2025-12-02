@@ -2,10 +2,10 @@
 
 import { useMemo, useEffect, useState, useCallback } from 'react';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faRocket } from '@fortawesome/free-solid-svg-icons';
+import { faRocket, faBolt } from '@fortawesome/free-solid-svg-icons';
 import { useRouter } from 'next/navigation';
 import { BacklogItem } from '@laurio/shared';
-import { getBacklogItems } from '@/lib/api';
+import { getBacklogItems, triggerDailyMix } from '@/lib/api';
 import BacklogTable from '@/components/BacklogTable';
 import GenerateContentForm from '@/components/GenerateContentForm';
 
@@ -45,6 +45,23 @@ export default function Home() {
     useEffect(() => {
         loadItems();
     }, [loadItems]);
+
+    const handleDailyMix = async () => {
+        const confirm = window.confirm('¿Generar mix diario de noticias? Esto creará 3 posts automáticos basados en noticias de hoy.');
+        if (!confirm) return;
+
+        setLoading(true);
+        try {
+            await triggerDailyMix();
+            alert('Mix diario generado con éxito. Actualizando tablero...');
+            loadItems();
+        } catch (error) {
+            alert('Error al generar mix diario');
+            console.error(error);
+        } finally {
+            setLoading(false);
+        }
+    };
 
     const handleItemClick = (id: string) => {
         router.push(`/backlog/${id}`);
@@ -118,6 +135,14 @@ export default function Home() {
                 </div>
                 <div className="flex items-center gap-3">
                     <button
+                        onClick={handleDailyMix}
+                        className="inline-flex items-center gap-2 rounded-xl bg-amber-400 px-4 py-2.5 text-sm font-semibold text-amber-950 shadow-lg shadow-amber-400/20 transition-transform hover:scale-[1.02] active:scale-[0.98]"
+                    >
+                        <FontAwesomeIcon icon={faBolt} />
+                        <span>Mix Diario</span>
+                    </button>
+                    <button
+                        id="btn-new-batch"
                         onClick={() => router.push('/generate')}
                         className="inline-flex items-center gap-2 rounded-xl bg-ink-900 px-4 py-2.5 text-sm font-semibold text-white shadow-lg shadow-ink-900/20 transition-transform hover:scale-[1.02] active:scale-[0.98]"
                     >
@@ -128,7 +153,7 @@ export default function Home() {
             </div>
 
             {/* Stats Grid */}
-            <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-5">
+            <div id="stats-grid" className="grid gap-4 sm:grid-cols-2 lg:grid-cols-5">
                 {stats.map((stat) => (
                     <div
                         key={stat.label}
@@ -145,7 +170,7 @@ export default function Home() {
             {/* Content Feed Section */}
             <section className="grid gap-6 lg:grid-cols-[1.45fr,1fr]">
                 <div className="space-y-4">
-                    <div className="rounded-3xl bg-white p-1 shadow-sm border border-slate-100">
+                    <div id="backlog-section" className="rounded-3xl bg-white p-1 shadow-sm border border-slate-100">
                         <div className="flex items-center justify-between px-4 py-3">
                             <h3 className="font-semibold text-ink-900">Backlog Reciente</h3>
                             <div className="flex gap-2">

@@ -11,6 +11,8 @@ interface ADKResult {
     sourceInsights: any;
     structure: any;
     visualPrompts: any;
+    visualMock?: string;
+    plannedDate?: string;
 }
 
 @Injectable()
@@ -23,6 +25,63 @@ export class OrchestrationService {
         private readonly httpService: HttpService,
         private readonly backlogService: BacklogService,
     ) { }
+
+    async runDailyMix() {
+        this.logger.log('Starting Daily Mix flow');
+
+        try {
+            // Call Python ADK with extended timeout
+            const { data } = await firstValueFrom(
+                this.httpService.post(`${this.adkUrl}/run-daily`, {}).pipe(timeout(this.adkTimeout))
+            );
+
+            this.logger.log(`Received ${data.results?.length || 0} results from ADK`);
+
+            const createdItems = [];
+
+            // Process results and save to Backlog
+            if (data.results && Array.isArray(data.results)) {
+                for (const result of data.results as ADKResult[]) {
+                    const newItem = await this.backlogService.create({
+                        topic: result.topic,
+                        status: 'ready_for_review',
+                        postType: result.postType || 'ig_post',
+                        targetAudience: 'youth', // Default
+                        mainMessage: result.mainMessage || '',
+                        objective: result.objective || 'Generated via Daily Mix',
+                        // Store complex objects as JSON strings
+                        sourceInsights: typeof result.sourceInsights === 'string'
+                            ? result.sourceInsights
+                            : JSON.stringify(result.sourceInsights || []),
+                        structure: typeof result.structure === 'string'
+                            ? result.structure
+                            : JSON.stringify(result.structure || {}),
+                        visualPrompts: typeof result.visualPrompts === 'string'
+                            ? result.visualPrompts
+                            : JSON.stringify(result.visualPrompts || []),
+                        plannedDate: result.plannedDate ? new Date(result.plannedDate) : null,
+                        notes: `Generated via Daily Mix`,
+                    });
+                    createdItems.push(newItem);
+                    this.logger.log(`Created backlog item: ${newItem.id}`);
+                }
+            }
+
+            return {
+                status: 'success',
+                message: `Successfully generated ${createdItems.length} daily content items`,
+                items: createdItems,
+            };
+
+        } catch (error) {
+            this.logger.error('Error calling ADK service (Daily Mix):', error.message);
+            return {
+                status: 'error',
+                message: error.message || 'Failed to generate daily mix',
+                error: error.message,
+            };
+        }
+    }
 
     async runFlow(topics: string[], context?: string, schedule?: { startAt?: string; intervalMinutes?: number }) {
         this.logger.log(`Starting flow for topics: ${topics.join(', ')}`);
